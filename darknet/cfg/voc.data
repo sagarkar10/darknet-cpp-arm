@@ -1,0 +1,6 @@
+classes= 20
+train  = /abs_path_to_train_data/example_train.txt
+valid  = /abs_path_to_validation_data/example_2007_test.txt
+names = data/voc.names
+backup = backup
+
