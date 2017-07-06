@@ -573,9 +573,9 @@ image load_weights_biases_bnparams(char* wf = "tiny-yolo-voc.weights",
 		tensor2vector(biases[i], biases_vector[i]);
 		if (layers[conv_layers[i]].type == CONVOLUTIONAL
 				&& layers[conv_layers[i]].size == 1) {
-			cout << "Skip BN parm" << endl;
+//			cout << "Skip BN parm" << endl;
 		} else {
-			cout << "BN param loading: " << endl;
+//			cout << "BN param loading: " << endl;
 			initialize_batchnorm_param(scales[i], fp, filters[i]);
 			initialize_batchnorm_param(rolling_mean[i], fp, filters[i]);
 			initialize_batchnorm_param(rolling_variance[i], fp, filters[i]);
@@ -760,25 +760,26 @@ void activator_run(int i) {
 	else
 		activate_tensor(out_conv[i], LINEAR);
 }
-
+ 
 float* forward_pass() {
 	for (int i = 0; i < 9; ++i) {
-		cout << "Running Conv: " << i << endl;
+//		cout << "Running Conv: " << i << endl;
 		conv[i].run();
-		cout << "Running Batchnorm: " << i << endl;
+//		cout << "Running Batchnorm: " << i << endl;
 		batch_norm_run(i);
-		cout << "Running Activation: " << i << endl;
+//		cout << "Running Activation: " << i << endl;
 		activator_run(i);
 		if (i < 6) {
-			cout << "Running Pool: " << i << endl;
+//			cout << "Running Pool: " << i << endl;
 			pool[i].run();
 		}
 	}
-	cout << "Running Region Layer" << endl;
+//	cout << "Running Region Layer" << endl;
 	float* output = forward_region_layer(layers[15]);
 	return output;
 }
 
+/*
 char** get_labels() {
 	char* names[] = { "aeroplane", "bicycle", "bird", "boat", "bottle", "bus",
 			"car", "cat", "chair", "cow", "diningtable", "dog", "horse",
@@ -786,15 +787,16 @@ char** get_labels() {
 			"tvmonitor" };
 	return names;
 }
+*/
 
-void tiny_yolo_run() {
+void tiny_yolo_run(int times) {
 	allocate_tensors();
 	configure_tensors();
 	allocator_allocate();
 	image im = load_weights_biases_bnparams("tiny-yolo-voc.weights", "dog.jpg",
 			false);
 	float* output; 
-	for(int loop=0;loop<20;++loop){
+	for(int loop=0;loop<times;++loop){
 		clock_t time;
 		time = clock();
 		output = forward_pass();
@@ -836,7 +838,7 @@ void print_network() {
 	}
 }
 
-fstream read_config() {
+void read_config() {
 	fstream file("tiny-yolo-voc.cfg");
 	int i = 0;
 	string str;
@@ -845,14 +847,21 @@ fstream read_config() {
 		net.num_layers = layers.size();
 		i++;
 	}
-	return file;
+	file.close();
 }
 
 int main(int argc, char const *argv[]) {
-	fstream file = read_config();
-	file.close();
+
+	clock_t start, config_end, run_start, run_end;
+	start = clock();
+	read_config();
 	config_init();
+	config_end = clock();
 	print_network();
-	tiny_yolo_run();
+	run_start = clock();
+	int run_times=1;
+	tiny_yolo_run(run_times);
+	run_end = clock();
+	cout<<"start: "<<start<<endl<<"config_end: "<<config_end<<endl<<"run_start: "<<run_start<<endl<<"run_end: "<<run_end<<endl;
 	return 0;
 }

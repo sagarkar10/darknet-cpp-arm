@@ -1,0 +1,137 @@
+Input :416 x 416 x 3
+Output :416 x 416 x 16
+Filters :16
+Input :416 x 416 x 16
+Output :208 x 208 x 16
+Filters :0
+Input :208 x 208 x 16
+Output :208 x 208 x 32
+Filters :32
+Input :208 x 208 x 32
+Output :104 x 104 x 32
+Filters :0
+Input :104 x 104 x 32
+Output :104 x 104 x 64
+Filters :64
+Input :104 x 104 x 64
+Output :52 x 52 x 64
+Filters :0
+Input :52 x 52 x 64
+Output :52 x 52 x 128
+Filters :128
+Input :52 x 52 x 128
+Output :26 x 26 x 128
+Filters :0
+Input :26 x 26 x 128
+Output :26 x 26 x 256
+Filters :256
+Input :26 x 26 x 256
+Output :13 x 13 x 256
+Filters :0
+Input :13 x 13 x 256
+Output :13 x 13 x 512
+Filters :512
+Input :13 x 13 x 512
+Output :13 x 13 x 512
+Filters :0
+Input :13 x 13 x 512
+Output :13 x 13 x 1024
+Filters :1024
+Input :13 x 13 x 1024
+Output :13 x 13 x 1024
+Filters :1024
+Input :13 x 13 x 1024
+Output :13 x 13 x 125
+Filters :125
+Input :13 x 13 x 125
+Output :13 x 13 x 125
+Filters :0
+Loading Weights and Biases For layer: 0
+Loading Weights and Biases For layer: 1
+Loading Weights and Biases For layer: 2
+Loading Weights and Biases For layer: 3
+Loading Weights and Biases For layer: 4
+Loading Weights and Biases For layer: 5
+Loading Weights and Biases For layer: 6
+Loading Weights and Biases For layer: 7
+Loading Weights and Biases For layer: 8
+Prediction time: %f16.2286
+test_detector: layers = 13, 13, 5
+car: 55%
+dog: 78%
+bicycle: 36%
+predictions saved at prediction.png
+start: 8289
+config_end: 9538
+run_start: 10205
+run_end: 19785964
+CPU: ARM Cortex-A53, speed 1200 MHz (estimated)
+Counted CPU_CYCLES events (Cycle) with a unit mask of 0x00 (No unit mask) count 100000
+samples  %        symbol name
+89439    45.4996  void matrix_matrix_multiply_f32<false>(arm_compute::ITensor const*, arm_compute::ITensor const*, arm_compute::ITensor*, arm_compute::Window const&, float) [clone .constprop.47]
+53404    27.1678  arm_compute::NEConvolutionLayerWeightsReshapeKernel::run(arm_compute::Window const&)
+13191     6.7106  arm_compute::NEGEMMTranspose1xWKernel::run(arm_compute::Window const&)
+9085      4.6217  arm_compute::TensorInfo::offset_element_in_bytes(arm_compute::Coordinates const&) const
+7530      3.8307  forward_batchnorm(arm_compute::Tensor&, vector<float>, vector<float>, vector<float>, vector<float>, int, int, int, int, bool)
+5530      2.8132  gemm_interleave_32bit_elements(arm_compute::ITensor const*, arm_compute::ITensor*, arm_compute::Window const&)
+4182      2.1275  arm_compute::NEIm2ColKernel::run_generic(arm_compute::Window const&)
+3234      1.6452  initialize_wb(arm_compute::Tensor&, _IO_FILE*)
+1971      1.0027  arm_compute::NECol2ImKernel::run(arm_compute::Window const&)
+1474      0.7499  stbi_zlib_compress(unsigned char*, int, int*, int)
+1242      0.6318  activate_tensor(arm_compute::Tensor&, ACTIVATION)
+1136      0.5779  arm_compute::TensorAllocator::lock()
+1072      0.5454  load_image_stb(char*, int)
+782       0.3978  void arm_compute::NEPoolingLayerKernel::pooling2<(arm_compute::PoolingType)0>(arm_compute::Window const&, arm_compute::Window const&)
+618       0.3144  stbi_write_png_to_mem(unsigned char*, int, int, int, int, int*)
+420       0.2137  resize_image(image, int, int)
+273       0.1389  arm_compute::Tensor::buffer() const
+251       0.1277  stbi__parse_zlib(stbi__zbuf*, int)
+250       0.1272  arm_compute::error_on_coordinates_dimensions_gte(char const*, char const*, int, arm_compute::Coordinates const&, unsigned int)
+236       0.1201  arm_compute::Tensor::info() const
+215       0.1094  arm_compute::ITensorAllocator::info()
+138       0.0702  stbi__idct_block(unsigned char*, int, short*)
+132       0.0672  stbi__YCbCr_to_RGB_row(unsigned char*, unsigned char const*, unsigned char const*, unsigned char const*, int, int)
+114       0.0580  stbiw__zlib_flushf(unsigned char*, unsigned int*, int*)
+88        0.0448  load(arm_compute::Tensor&, char*)
+82        0.0417  stbi__jpeg_decode_block(stbi__jpeg*, short*, stbi__huffman*, stbi__huffman*, short*, int, unsigned char*) [clone .part.11]
+61        0.0310  set_pixel(image, int, int, int, float)
+48        0.0244  stbi__grow_buffer_unsafe(stbi__jpeg*)
+34        0.0173  stbi__create_png_image_raw(stbi__png*, unsigned char*, unsigned int, int, unsigned int, unsigned int, int, int) [clone .isra.13]
+33        0.0168  embed_image(image, image, int, int)
+31        0.0158  stbi__compute_huffman_codes(stbi__zbuf*)
+30        0.0153  save_image_png(image, char const*)
+28        0.0142  stbi__convert_format(unsigned char*, int, int, unsigned int, unsigned int)
+26        0.0132  stbi__zbuild_huffman(stbi__zhuffman*, unsigned char*, int)
+23        0.0117  stbiw__crc32(unsigned char*, int)
+22        0.0112  stbi__resample_row_v_2(unsigned char*, unsigned char*, unsigned char*, int, int)
+20        0.0102  stbi__jpeg_load(stbi__context*, int*, int*, int*, int)
+17        0.0086  nms_comparator(void const*, void const*)
+16        0.0081  letterbox_image(image, int, int)
+11        0.0056  stbi__get16be(stbi__context*)
+10        0.0051  batch_norm_run(int)
+9         0.0046  stbiw__sbgrowf(void**, int, int) [clone .constprop.38]
+7         0.0036  stbi__get32be(stbi__context*)
+6         0.0031  stbi__parse_png_file(stbi__png*, int, int)
+5         0.0025  border_image(image, int)
+5         0.0025  forward_region_layer(layer)
+4         0.0020  arm_compute::CPPScheduler::multithread(arm_compute::ICPPKernel*, unsigned long)
+4         0.0020  do_nms_sort
+4         0.0020  stbi__fill_bits(stbi__zbuf*)
+4         0.0020  tiny_yolo_run(int)
+3         0.0015  draw_box(image, int, int, int, int, float, float, float)
+3         0.0015  draw_detections(image, int, float, box*, float**, char**, image**, int)
+2         0.0010  arm_compute::NEConvolutionLayer::~NEConvolutionLayer()
+2         0.0010  stbi__get8(stbi__context*)
+2         0.0010  stbi__load_flip(stbi__context*, int*, int*, int*, int)
+1        5.1e-04  arm_compute::IKernel::window() const
+1        5.1e-04  arm_compute::NEConvolutionLayer::configure(arm_compute::ITensor const*, arm_compute::ITensor const*, arm_compute::ITensor const*, arm_compute::ITensor*, arm_compute::PadStrideInfo const&)
+1        5.1e-04  arm_compute::TensorAllocator::allocate()
+1        5.1e-04  arm_compute::error_on_invalid_subwindow(char const*, char const*, int, arm_compute::Window const&, arm_compute::Window const&)
+1        5.1e-04  composite_image(image, image, int, int)
+1        5.1e-04  get_label(image**, char*, int)
+1        5.1e-04  max_index
+1        5.1e-04  stbi__getn(stbi__context*, unsigned char*, int)
+1        5.1e-04  stbi__jpeg_test(stbi__context*)
+1        5.1e-04  stbi__stdio_read(void*, char*, int)
+1        5.1e-04  stbi_zlib_decode_malloc_guesssize_headerflag(char const*, int, int, int*, int)
+1        5.1e-04  tensor2array(arm_compute::Tensor&, float*)

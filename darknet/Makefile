@@ -11,7 +11,7 @@ CFLAGS_CPP=-Wno-write-strings -std=c++0x -I../ComputeLibrary/
 
 OPTS=-O3 -funroll-loops -ftree-vectorize 
 
-LDFLAGS=-lm -L../ComputeLibrary/build/arm_compute/ -larm_compute
+LDFLAGS=-lm --force-load ../ComputeLibrary/build/arm_compute/libarm_compute-static.a 
 COMMON= 
 CFLAGS=-Wall -Wfatal-errors 
 
@@ -51,7 +51,7 @@ results:
 
 .PHONY: clean
 
-clean-cpp:
+clean:
 	rm -rf $(OBJS_CPP) $(EXEC_CPP) 
 
 

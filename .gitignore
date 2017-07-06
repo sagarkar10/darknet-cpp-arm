@@ -2,3 +2,4 @@
 *.o
 *.os
 ComputeLibrary/build
+oprofile-data/
