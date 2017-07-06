@@ -1,7 +1,5 @@
 #include <stdio.h>
-extern "C" {
 #include "image.hpp"
-}
 #include "math.h"
 #include "limits.h"
 #include <string>
@@ -795,10 +793,11 @@ void tiny_yolo_run() {
 	allocator_allocate();
 	image im = load_weights_biases_bnparams("tiny-yolo-voc.weights", "dog.jpg",
 			false);
+	float* output; 
 	for(int loop=0;loop<20;++loop){
 		clock_t time;
 		time = clock();
-		float* output = forward_pass();
+		output = forward_pass();
 		cout << "Prediction time: %f" << sec(clock() - time) << endl;
 	}
 	layer l = layers[15];
