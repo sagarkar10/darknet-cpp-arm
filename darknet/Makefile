@@ -11,7 +11,7 @@ CFLAGS_CPP=-Wno-write-strings -std=c++0x -I../ComputeLibrary/
 
 OPTS=-O3 -funroll-loops -ftree-vectorize 
 
-LDFLAGS=-lm --force-load ../ComputeLibrary/build/arm_compute/libarm_compute-static.a 
+LDFLAGS=-lm ../ComputeLibrary/build/arm_compute/libarm_compute-static.a ../ComputeLibrary/build/arm_compute/libarm_compute_core-static.a -lpthread 
 COMMON= 
 CFLAGS=-Wall -Wfatal-errors 
 
