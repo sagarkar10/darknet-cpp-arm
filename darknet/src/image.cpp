@@ -1,14 +1,14 @@
-#include "image.h"
-#include "utils.h"
+#include "image.hpp"
+#include "utils.hpp"
 //#include "blas.h"
 //#include "cuda.h"
 #include <stdio.h>
 #include <math.h>
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "stb_image.hpp"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "stb_image_write.h"
+#include "stb_image_write.hpp"
 
 #ifdef OPENCV
 #include "opencv2/highgui/highgui_c.h"

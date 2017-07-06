@@ -1,5 +1,7 @@
+R"(
+
 /*
- * Copyright (c) 2016, 2017 ARM Limited.
+ * Copyright (c) 2017 ARM Limited.
  *
  * SPDX-License-Identifier: MIT
  *
@@ -21,23 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef __ARM_COMPUTE_OPENCL_H__
-#define __ARM_COMPUTE_OPENCL_H__
+#ifndef ARM_COMPUTE_TYPES_H
+#define ARM_COMPUTE_TYPES_H
 
-/* Configure the Khronos C++ wrapper to target OpenCL 1.2: */
-#define CL_HPP_ENABLE_EXCEPTIONS
-#define CL_HPP_CL_1_2_DEFAULT_BUILD
-#define CL_HPP_TARGET_OPENCL_VERSION 110
-#define CL_HPP_MINIMUM_OPENCL_VERSION 110
-#include <CL/cl2.hpp>
-
-namespace cl
+/** 2D Coordinates structure */
+typedef struct Coordinates2D
 {
-static const NDRange Range_128_1 = NDRange(128, 1);
-}
+    int x; /**< The x coordinate. */
+    int y; /**< The y coordinate. */
+} Coordinates2D;
 
-namespace arm_compute
+/* Keypoint struct */
+typedef struct Keypoint
 {
-bool opencl_is_available();
-}
-#endif /* __ARM_COMPUTE_OPENCL_H__ */
+    int   x;               /**< The x coordinate. */
+    int   y;               /**< The y coordinate. */
+    float strength;        /**< The strength of the keypoint. Its definition is specific to the corner detector. */
+    float scale;           /**< Initialized to 0 by corner detectors. */
+    float orientation;     /**< Initialized to 0 by corner detectors. */
+    int   tracking_status; /**< A zero indicates a lost point. Initialized to 1 by corner detectors. */
+    float error;           /**< A tracking method specific error. Initialized to 0 by corner detectors. */
+} Keypoint;
+
+#endif // ARM_COMPUTE_TYPES_H
+
+)"

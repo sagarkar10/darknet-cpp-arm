@@ -9,7 +9,7 @@
 #include <float.h>
 #include <limits.h>
 
-#include "utils.h"
+#include "utils.hpp"
 
 int *read_map(char *filename)
 {

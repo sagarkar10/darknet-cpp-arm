@@ -1,4 +1,4 @@
-#include "box.h"
+#include "box.hpp"
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>

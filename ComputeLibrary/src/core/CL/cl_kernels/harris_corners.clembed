@@ -1,0 +1,597 @@
+R"(
+
+/*
+ * Copyright (c) 2016, 2017 ARM Limited.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+/*
+ * Copyright (c) 2016, 2017 ARM Limited.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+#ifndef ARM_COMPUTE_HELPER_H
+#define ARM_COMPUTE_HELPER_H
+
+#pragma OPENCL EXTENSION cl_khr_fp16 : enable
+
+#define CLAMP(x, min_val, max_val) min(max(x, min_val), max_val)
+
+#define VEC_DATA_TYPE_STR(type, size) type##size
+#define VEC_DATA_TYPE(type, size) VEC_DATA_TYPE_STR(type, size)
+
+#define CONVERT_STR(x, type) (convert_##type((x)))
+#define CONVERT(x, type) CONVERT_STR(x, type)
+
+#define CONVERT_SAT_STR(x, type) (convert_##type##_sat((x)))
+#define CONVERT_SAT(x, type) CONVERT_SAT_STR(x, type)
+
+#define CONVERT_SAT_ROUND_STR(x, type, round) (convert_##type##_sat_##round((x)))
+#define CONVERT_SAT_ROUND(x, type, round) CONVERT_SAT_ROUND_STR(x, type, round)
+
+#define VECTOR_DECLARATION(name)     \
+    __global uchar *name##_ptr,      \
+    uint        name##_stride_x, \
+    uint        name##_step_x,   \
+    uint        name##_offset_first_element_in_bytes
+
+#define IMAGE_DECLARATION(name)      \
+    __global uchar *name##_ptr,      \
+    uint        name##_stride_x, \
+    uint        name##_step_x,   \
+    uint        name##_stride_y, \
+    uint        name##_step_y,   \
+    uint        name##_offset_first_element_in_bytes
+
+#define TENSOR3D_DECLARATION(name)   \
+    __global uchar *name##_ptr,      \
+    uint        name##_stride_x, \
+    uint        name##_step_x,   \
+    uint        name##_stride_y, \
+    uint        name##_step_y,   \
+    uint        name##_stride_z, \
+    uint        name##_step_z,   \
+    uint        name##_offset_first_element_in_bytes
+
+#define CONVERT_TO_VECTOR_STRUCT(name) \
+    update_vector_workitem_ptr(name##_ptr, name##_offset_first_element_in_bytes, name##_stride_x, name##_step_x)
+
+#define CONVERT_TO_VECTOR_STRUCT_NO_STEP(name) \
+    update_vector_workitem_ptr(name##_ptr, name##_offset_first_element_in_bytes, name##_stride_x, 0)
+
+#define CONVERT_TO_IMAGE_STRUCT(name) \
+    update_image_workitem_ptr(name##_ptr, name##_offset_first_element_in_bytes, name##_stride_x, name##_step_x, name##_stride_y, name##_step_y)
+
+#define CONVERT_TO_IMAGE_STRUCT_NO_STEP(name) \
+    update_image_workitem_ptr(name##_ptr, name##_offset_first_element_in_bytes, name##_stride_x, 0, name##_stride_y, 0)
+
+#define CONVERT_TO_TENSOR3D_STRUCT(name)                                                                                                           \
+    update_tensor3D_workitem_ptr(name##_ptr, name##_offset_first_element_in_bytes, name##_stride_x, name##_step_x, name##_stride_y, name##_step_y, \
+                                 name##_stride_z, name##_step_z)
+
+#define CONVERT_TO_TENSOR3D_STRUCT_NO_STEP(name) \
+    update_tensor3D_workitem_ptr(name##_ptr, name##_offset_first_element_in_bytes, name##_stride_x, 0, name##_stride_y, 0, name##_stride_z, 0)
+
+/** Structure to hold Vector information */
+typedef struct Vector
+{
+    __global uchar *ptr;                           /**< Pointer to the starting postion of the buffer */
+    int             offset_first_element_in_bytes; /**< The offset of the first element in the source image */
+    int             stride_x;                      /**< Stride of the image in X dimension (in bytes) */
+} Vector;
+
+/** Structure to hold Image information */
+typedef struct Image
+{
+    __global uchar *ptr;                           /**< Pointer to the starting postion of the buffer */
+    int             offset_first_element_in_bytes; /**< The offset of the first element in the source image */
+    int             stride_x;                      /**< Stride of the image in X dimension (in bytes) */
+    int             stride_y;                      /**< Stride of the image in Y dimension (in bytes) */
+} Image;
+
+/** Structure to hold 3D tensor information */
+typedef struct Tensor3D
+{
+    __global uchar *ptr;                           /**< Pointer to the starting postion of the buffer */
+    int             offset_first_element_in_bytes; /**< The offset of the first element in the source image */
+    int             stride_x;                      /**< Stride of the image in X dimension (in bytes) */
+    int             stride_y;                      /**< Stride of the image in Y dimension (in bytes) */
+    int             stride_z;                      /**< Stride of the image in Z dimension (in bytes) */
+} Tensor3D;
+
+/** Wrap vector information into an Vector structure, and make the pointer point at this workitem's data.
+ *
+ * @param[in] ptr                           Pointer to the starting postion of the buffer
+ * @param[in] offset_first_element_in_bytes The offset of the first element in the source vector
+ * @param[in] stride_x                      Stride of the vector in X dimension (in bytes)
+ * @param[in] step_x                        stride_x * number of elements along X processed per workitem(in bytes)
+ *
+ * @return An image object
+ */
+Vector inline update_vector_workitem_ptr(__global uchar *ptr, uint offset_first_element_in_bytes, uint stride_x, uint step_x)
+{
+    Vector vector =
+    {
+        .ptr                           = ptr,
+        .offset_first_element_in_bytes = offset_first_element_in_bytes,
+        .stride_x                      = stride_x,
+    };
+    vector.ptr += vector.offset_first_element_in_bytes + get_global_id(0) * step_x;
+    return vector;
+}
+
+/** Wrap image information into an Image structure, and make the pointer point at this workitem's data.
+ *
+ * @param[in] ptr                           Pointer to the starting postion of the buffer
+ * @param[in] offset_first_element_in_bytes The offset of the first element in the source image
+ * @param[in] stride_x                      Stride of the image in X dimension (in bytes)
+ * @param[in] step_x                        stride_x * number of elements along X processed per workitem(in bytes)
+ * @param[in] stride_y                      Stride of the image in Y dimension (in bytes)
+ * @param[in] step_y                        stride_y * number of elements along Y processed per workitem(in bytes)
+ *
+ * @return An image object
+ */
+Image inline update_image_workitem_ptr(__global uchar *ptr, uint offset_first_element_in_bytes, uint stride_x, uint step_x, uint stride_y, uint step_y)
+{
+    Image img =
+    {
+        .ptr                           = ptr,
+        .offset_first_element_in_bytes = offset_first_element_in_bytes,
+        .stride_x                      = stride_x,
+        .stride_y                      = stride_y
+    };
+    img.ptr += img.offset_first_element_in_bytes + get_global_id(0) * step_x + get_global_id(1) * step_y;
+    return img;
+}
+
+/** Wrap 3D tensor information into an tensor structure, and make the pointer point at this workitem's data.
+ *
+ * @param[in] ptr                           Pointer to the starting postion of the buffer
+ * @param[in] offset_first_element_in_bytes The offset of the first element in the source image
+ * @param[in] stride_x                      Stride of the image in X dimension (in bytes)
+ * @param[in] step_x                        stride_x * number of elements along X processed per workitem(in bytes)
+ * @param[in] stride_y                      Stride of the image in Y dimension (in bytes)
+ * @param[in] step_y                        stride_y * number of elements along Y processed per workitem(in bytes)
+ * @param[in] stride_z                      Stride of the image in Z dimension (in bytes)
+ * @param[in] step_z                        stride_z * number of elements along Z processed per workitem(in bytes)
+ *
+ * @return A 3D tensor object
+ */
+Tensor3D inline update_tensor3D_workitem_ptr(__global uchar *ptr, uint offset_first_element_in_bytes, uint stride_x, uint step_x, uint stride_y, uint step_y, uint stride_z, uint step_z)
+{
+    Tensor3D tensor =
+    {
+        .ptr                           = ptr,
+        .offset_first_element_in_bytes = offset_first_element_in_bytes,
+        .stride_x                      = stride_x,
+        .stride_y                      = stride_y,
+        .stride_z                      = stride_z
+    };
+    tensor.ptr += tensor.offset_first_element_in_bytes + get_global_id(0) * step_x + get_global_id(1) * step_y + get_global_id(2) * step_z;
+    return tensor;
+}
+
+/** Get the pointer position of a Vector
+ *
+ * @param[in] vec Pointer to the starting position of the buffer
+ * @param[in] x   Relative X position
+ */
+__global inline const uchar *vector_offset(const Vector *vec, int x)
+{
+    return vec->ptr + x * vec->stride_x;
+}
+
+/** Get the pointer position of a Image
+ *
+ * @param[in] img Pointer to the starting position of the buffer
+ * @param[in] x   Relative X position
+ * @param[in] y   Relative Y position
+ */
+__global inline uchar *offset(const Image *img, int x, int y)
+{
+    return img->ptr + x * img->stride_x + y * img->stride_y;
+}
+
+/** Get the pointer position of a Tensor3D
+ *
+ * @param[in] tensor Pointer to the starting postion of the buffer
+ * @param[in] x      Relative X position
+ * @param[in] y      Relative Y position
+ * @param[in] z      Relative Z position
+ */
+__global inline const uchar *tensor3D_offset(const Tensor3D *tensor, int x, int y, int z)
+{
+    return tensor->ptr + x * tensor->stride_x + y * tensor->stride_y + z * tensor->stride_z;
+}
+
+#endif // _HELPER_H
+
+/** Function running harris score on 3x3 block size
+ *
+ * @attention: The input data type should be passed using a compile option -DDATA_TYPE. Supported types: short and int.
+ *             e.g. -DDATA_TYPE=short.
+ *
+ * @param[in]  src_gx_ptr                           Pointer to the first source image. Supported data types: S16, S32
+ * @param[in]  src_gx_stride_x                      Stride of the source image in X dimension (in bytes)
+ * @param[in]  src_gx_step_x                        src_gx_stride_x * number of elements along X processed per workitem(in bytes)
+ * @param[in]  src_gx_stride_y                      Stride of the source image in Y dimension (in bytes)
+ * @param[in]  src_gx_step_y                        src_gx_stride_y * number of elements along Y processed per workitem(in bytes)
+ * @param[in]  src_gx_offset_first_element_in_bytes The offset of the first element in the source image
+ * @param[in]  src_gy_ptr                           Pointer to the second source image. Supported data types: S16, S32
+ * @param[in]  src_gy_stride_x                      Stride of the destination image in X dimension (in bytes)
+ * @param[in]  src_gy_step_x                        src_gy_stride_x * number of elements along X processed per workitem(in bytes)
+ * @param[in]  src_gy_stride_y                      Stride of the destination image in Y dimension (in bytes)
+ * @param[in]  src_gy_step_y                        src_gy_stride_y * number of elements along Y processed per workitem(in bytes)
+ * @param[in]  src_gy_offset_first_element_in_bytes The offset of the first element in the destination image
+ * @param[out] vc_ptr                               Pointer to the destination image. Supported data types: F32
+ * @param[in]  vc_stride_x                          Stride of the destination image in X dimension (in bytes)
+ * @param[in]  vc_step_x                            vc_stride_x * number of elements along X processed per workitem(in bytes)
+ * @param[in]  vc_stride_y                          Stride of the destination image in Y dimension (in bytes)
+ * @param[in]  vc_step_y                            vc_stride_y * number of elements along Y processed per workitem(in bytes)
+ * @param[in]  vc_offset_first_element_in_bytes     The offset of the first element in the destination image
+ * @param[in]  sensitivity                          Sensitivity threshold k from the Harris-Stephens equation
+ * @param[in]  strength_thresh                      Minimum threshold with which to eliminate Harris Corner scores
+ * @param[in]  pow4_normalization_factor            Normalization factor to apply harris score
+ */
+__kernel void harris_score_3x3(
+    IMAGE_DECLARATION(src_gx),
+    IMAGE_DECLARATION(src_gy),
+    IMAGE_DECLARATION(vc),
+    float sensitivity,
+    float strength_thresh,
+    float pow4_normalization_factor)
+{
+    Image src_gx = CONVERT_TO_IMAGE_STRUCT(src_gx);
+    Image src_gy = CONVERT_TO_IMAGE_STRUCT(src_gy);
+    Image vc     = CONVERT_TO_IMAGE_STRUCT(vc);
+
+    /* Gx^2, Gy^2 and Gx*Gy */
+    float4 gx2  = (float4)0.0f;
+    float4 gy2  = (float4)0.0f;
+    float4 gxgy = (float4)0.0f;
+
+    /* Row0 */
+    VEC_DATA_TYPE(DATA_TYPE, 8)
+    temp_gx = vload8(0, (__global DATA_TYPE *)offset(&src_gx, -1, -1));
+    VEC_DATA_TYPE(DATA_TYPE, 8)
+    temp_gy = vload8(0, (__global DATA_TYPE *)offset(&src_gy, -1, -1));
+
+    float4 l_gx = convert_float4(temp_gx.s0123);
+    float4 m_gx = convert_float4(temp_gx.s1234);
+    float4 r_gx = convert_float4(temp_gx.s2345);
+
+    float4 l_gy = convert_float4(temp_gy.s0123);
+    float4 m_gy = convert_float4(temp_gy.s1234);
+    float4 r_gy = convert_float4(temp_gy.s2345);
+
+    gx2 += (l_gx * l_gx) + (m_gx * m_gx) + (r_gx * r_gx);
+    gy2 += (l_gy * l_gy) + (m_gy * m_gy) + (r_gy * r_gy);
+    gxgy += (l_gx * l_gy) + (m_gx * m_gy) + (r_gx * r_gy);
+
+    /* Row1 */
+    temp_gx = vload8(0, (__global DATA_TYPE *)offset(&src_gx, -1, 0));
+    temp_gy = vload8(0, (__global DATA_TYPE *)offset(&src_gy, -1, 0));
+
+    l_gx = convert_float4(temp_gx.s0123);
+    m_gx = convert_float4(temp_gx.s1234);
+    r_gx = convert_float4(temp_gx.s2345);
+
+    l_gy = convert_float4(temp_gy.s0123);
+    m_gy = convert_float4(temp_gy.s1234);
+    r_gy = convert_float4(temp_gy.s2345);
+
+    gx2 += (l_gx * l_gx) + (m_gx * m_gx) + (r_gx * r_gx);
+    gy2 += (l_gy * l_gy) + (m_gy * m_gy) + (r_gy * r_gy);
+    gxgy += (l_gx * l_gy) + (m_gx * m_gy) + (r_gx * r_gy);
+
+    /* Row2 */
+    temp_gx = vload8(0, (__global DATA_TYPE *)offset(&src_gx, -1, 1));
+    temp_gy = vload8(0, (__global DATA_TYPE *)offset(&src_gy, -1, 1));
+
+    l_gx = convert_float4(temp_gx.s0123);
+    m_gx = convert_float4(temp_gx.s1234);
+    r_gx = convert_float4(temp_gx.s2345);
+
+    l_gy = convert_float4(temp_gy.s0123);
+    m_gy = convert_float4(temp_gy.s1234);
+    r_gy = convert_float4(temp_gy.s2345);
+
+    gx2 += (l_gx * l_gx) + (m_gx * m_gx) + (r_gx * r_gx);
+    gy2 += (l_gy * l_gy) + (m_gy * m_gy) + (r_gy * r_gy);
+    gxgy += (l_gx * l_gy) + (m_gx * m_gy) + (r_gx * r_gy);
+
+    /* Compute trace and determinant */
+    float4 trace = gx2 + gy2;
+    float4 det   = gx2 * gy2 - (gxgy * gxgy);
+
+    /* Compute harris score */
+    float4 mc = (det - (sensitivity * (trace * trace))) * pow4_normalization_factor;
+
+    mc = select(0.0f, mc, mc > (float4)strength_thresh);
+
+    vstore4(mc, 0, (__global float *)vc.ptr);
+}
+
+/** Function for calculating harris score 1x5.
+ *
+ * @param[in] src_gx Pointer to gx gradient image.
+ * @param[in] src_gy Pointer to gy gradient image.
+ * @param[in] row    Relative row.
+ */
+inline float16 harris_score_1x5(Image *src_gx, Image *src_gy, int row)
+{
+    float4 gx2  = 0.0f;
+    float4 gy2  = 0.0f;
+    float4 gxgy = 0.0f;
+
+    /* Row */
+    VEC_DATA_TYPE(DATA_TYPE, 8)
+    temp_gx = vload8(0, (__global DATA_TYPE *)offset(src_gx, -2, row));
+    VEC_DATA_TYPE(DATA_TYPE, 8)
+    temp_gy = vload8(0, (__global DATA_TYPE *)offset(src_gy, -2, row));
+
+    float4 gx = convert_float4(temp_gx.s0123);
+    float4 gy = convert_float4(temp_gy.s0123);
+    gx2 += (gx * gx);
+    gy2 += (gy * gy);
+    gxgy += (gx * gy);
+
+    gx = convert_float4(temp_gx.s1234);
+    gy = convert_float4(temp_gy.s1234);
+    gx2 += (gx * gx);
+    gy2 += (gy * gy);
+    gxgy += (gx * gy);
+
+    gx = convert_float4(temp_gx.s2345);
+    gy = convert_float4(temp_gy.s2345);
+    gx2 += (gx * gx);
+    gy2 += (gy * gy);
+    gxgy += (gx * gy);
+
+    gx = convert_float4(temp_gx.s3456);
+    gy = convert_float4(temp_gy.s3456);
+    gx2 += (gx * gx);
+    gy2 += (gy * gy);
+    gxgy += (gx * gy);
+
+    gx = convert_float4(temp_gx.s4567);
+    gy = convert_float4(temp_gy.s4567);
+    gx2 += (gx * gx);
+    gy2 += (gy * gy);
+    gxgy += (gx * gy);
+
+    return (float16)(gx2, gy2, gxgy, (float4)0);
+}
+
+/** Function running harris score on 5x5 block size
+ *
+ * @attention: The input data type should be passed using a compile option -DDATA_TYPE. Supported types: short and int.
+ *             e.g. -DDATA_TYPE=short.
+ *
+ * @param[in]  src_gx_ptr                           Pointer to the first source image. Supported data types: S16, S32
+ * @param[in]  src_gx_stride_x                      Stride of the source image in X dimension (in bytes)
+ * @param[in]  src_gx_step_x                        src_gx_stride_x * number of elements along X processed per workitem(in bytes)
+ * @param[in]  src_gx_stride_y                      Stride of the source image in Y dimension (in bytes)
+ * @param[in]  src_gx_step_y                        src_gx_stride_y * number of elements along Y processed per workitem(in bytes)
+ * @param[in]  src_gx_offset_first_element_in_bytes The offset of the first element in the source image
+ * @param[in]  src_gy_ptr                           Pointer to the second source image. Supported data types: S16, S32
+ * @param[in]  src_gy_stride_x                      Stride of the destination image in X dimension (in bytes)
+ * @param[in]  src_gy_step_x                        src_gy_stride_x * number of elements along X processed per workitem(in bytes)
+ * @param[in]  src_gy_stride_y                      Stride of the destination image in Y dimension (in bytes)
+ * @param[in]  src_gy_step_y                        src_gy_stride_y * number of elements along Y processed per workitem(in bytes)
+ * @param[in]  src_gy_offset_first_element_in_bytes The offset of the first element in the destination image
+ * @param[out] vc_ptr                               Pointer to the destination image. Supported data types: F32
+ * @param[in]  vc_stride_x                          Stride of the destination image in X dimension (in bytes)
+ * @param[in]  vc_step_x                            vc_stride_x * number of elements along X processed per workitem(in bytes)
+ * @param[in]  vc_stride_y                          Stride of the destination image in Y dimension (in bytes)
+ * @param[in]  vc_step_y                            vc_stride_y * number of elements along Y processed per workitem(in bytes)
+ * @param[in]  vc_offset_first_element_in_bytes     The offset of the first element in the destination image
+ * @param[in]  sensitivity                          Sensitivity threshold k from the Harris-Stephens equation
+ * @param[in]  strength_thresh                      Minimum threshold with which to eliminate Harris Corner scores
+ * @param[in]  pow4_normalization_factor            Normalization factor to apply harris score
+ */
+__kernel void harris_score_5x5(
+    IMAGE_DECLARATION(src_gx),
+    IMAGE_DECLARATION(src_gy),
+    IMAGE_DECLARATION(vc),
+    float sensitivity,
+    float strength_thresh,
+    float pow4_normalization_factor)
+{
+    Image src_gx = CONVERT_TO_IMAGE_STRUCT(src_gx);
+    Image src_gy = CONVERT_TO_IMAGE_STRUCT(src_gy);
+    Image vc     = CONVERT_TO_IMAGE_STRUCT(vc);
+
+    /* Gx^2, Gy^2 and Gx*Gy */
+    float16 res = (float16)0.0f;
+
+    /* Compute row */
+    for(int i = -2; i < 3; i++)
+    {
+        res += harris_score_1x5(&src_gx, &src_gy, i);
+    }
+
+    float4 gx2  = res.s0123;
+    float4 gy2  = res.s4567;
+    float4 gxgy = res.s89AB;
+
+    /* Compute trace and determinant */
+    float4 trace = gx2 + gy2;
+    float4 det   = gx2 * gy2 - (gxgy * gxgy);
+
+    /* Compute harris score */
+    float4 mc = (det - (sensitivity * (trace * trace))) * pow4_normalization_factor;
+
+    mc = select(0.0f, mc, mc > (float4)strength_thresh);
+
+    vstore4(mc, 0, (__global float *)vc.ptr);
+}
+
+/** Function for calculating harris score 1x7.
+ *
+ * @param[in] src_gx Pointer to gx gradient image.
+ * @param[in] src_gy Pointer to gy gradient image.
+ * @param[in] row    Relative row.
+ */
+inline float16 harris_score_1x7(Image *src_gx, Image *src_gy, int row)
+{
+    float4 gx2  = 0.0f;
+    float4 gy2  = 0.0f;
+    float4 gxgy = 0.0f;
+
+    /* Row */
+    VEC_DATA_TYPE(DATA_TYPE, 8)
+    temp_gx0 = vload8(0, (__global DATA_TYPE *)offset(src_gx, -3, row));
+    VEC_DATA_TYPE(DATA_TYPE, 8)
+    temp_gy0 = vload8(0, (__global DATA_TYPE *)offset(src_gy, -3, row));
+    VEC_DATA_TYPE(DATA_TYPE, 2)
+    temp_gx1 = vload2(0, (__global DATA_TYPE *)offset(src_gx, 5, row));
+    VEC_DATA_TYPE(DATA_TYPE, 2)
+    temp_gy1 = vload2(0, (__global DATA_TYPE *)offset(src_gy, 5, row));
+
+    float4 gx = convert_float4(temp_gx0.s0123);
+    float4 gy = convert_float4(temp_gy0.s0123);
+    gx2 += (gx * gx);
+    gy2 += (gy * gy);
+    gxgy += (gx * gy);
+
+    gx = convert_float4(temp_gx0.s1234);
+    gy = convert_float4(temp_gy0.s1234);
+    gx2 += (gx * gx);
+    gy2 += (gy * gy);
+    gxgy += (gx * gy);
+
+    gx = convert_float4(temp_gx0.s2345);
+    gy = convert_float4(temp_gy0.s2345);
+    gx2 += (gx * gx);
+    gy2 += (gy * gy);
+    gxgy += (gx * gy);
+
+    gx = convert_float4(temp_gx0.s3456);
+    gy = convert_float4(temp_gy0.s3456);
+    gx2 += (gx * gx);
+    gy2 += (gy * gy);
+    gxgy += (gx * gy);
+
+    gx = convert_float4(temp_gx0.s4567);
+    gy = convert_float4(temp_gy0.s4567);
+    gx2 += (gx * gx);
+    gy2 += (gy * gy);
+    gxgy += (gx * gy);
+
+    gx = convert_float4((VEC_DATA_TYPE(DATA_TYPE, 4))(temp_gx0.s567, temp_gx1.s0));
+    gy = convert_float4((VEC_DATA_TYPE(DATA_TYPE, 4))(temp_gy0.s567, temp_gy1.s0));
+    gx2 += (gx * gx);
+    gy2 += (gy * gy);
+    gxgy += (gx * gy);
+
+    gx = convert_float4((VEC_DATA_TYPE(DATA_TYPE, 4))(temp_gx0.s67, temp_gx1.s01));
+    gy = convert_float4((VEC_DATA_TYPE(DATA_TYPE, 4))(temp_gy0.s67, temp_gy1.s01));
+    gx2 += (gx * gx);
+    gy2 += (gy * gy);
+    gxgy += (gx * gy);
+
+    return (float16)(gx2, gy2, gxgy, (float4)0);
+}
+
+/** Function running harris score on 7x7 block size
+ *
+ * @attention: The input data type should be passed using a compile option -DDATA_TYPE. Supported types: short and int.
+ *             e.g. -DDATA_TYPE=short.
+ *
+ * @param[in]  src_gx_ptr                           Pointer to the first source image. Supported data types: S16, S32
+ * @param[in]  src_gx_stride_x                      Stride of the source image in X dimension (in bytes)
+ * @param[in]  src_gx_step_x                        src_gx_stride_x * number of elements along X processed per workitem(in bytes)
+ * @param[in]  src_gx_stride_y                      Stride of the source image in Y dimension (in bytes)
+ * @param[in]  src_gx_step_y                        src_gx_stride_y * number of elements along Y processed per workitem(in bytes)
+ * @param[in]  src_gx_offset_first_element_in_bytes The offset of the first element in the source image
+ * @param[in]  src_gy_ptr                           Pointer to the second source image. Supported data types: S16, S32
+ * @param[in]  src_gy_stride_x                      Stride of the destination image in X dimension (in bytes)
+ * @param[in]  src_gy_step_x                        src_gy_stride_x * number of elements along X processed per workitem(in bytes)
+ * @param[in]  src_gy_stride_y                      Stride of the destination image in Y dimension (in bytes)
+ * @param[in]  src_gy_step_y                        src_gy_stride_y * number of elements along Y processed per workitem(in bytes)
+ * @param[in]  src_gy_offset_first_element_in_bytes The offset of the first element in the destination image
+ * @param[out] vc_ptr                               Pointer to the destination image. Supported data types: F32
+ * @param[in]  vc_stride_x                          Stride of the destination image in X dimension (in bytes)
+ * @param[in]  vc_step_x                            vc_stride_x * number of elements along X processed per workitem(in bytes)
+ * @param[in]  vc_stride_y                          Stride of the destination image in Y dimension (in bytes)
+ * @param[in]  vc_step_y                            vc_stride_y * number of elements along Y processed per workitem(in bytes)
+ * @param[in]  vc_offset_first_element_in_bytes     The offset of the first element in the destination image
+ * @param[in]  sensitivity                          Sensitivity threshold k from the Harris-Stephens equation
+ * @param[in]  strength_thresh                      Minimum threshold with which to eliminate Harris Corner scores
+ * @param[in]  pow4_normalization_factor            Normalization factor to apply harris score
+ */
+__kernel void harris_score_7x7(
+    IMAGE_DECLARATION(src_gx),
+    IMAGE_DECLARATION(src_gy),
+    IMAGE_DECLARATION(vc),
+    float sensitivity,
+    float strength_thresh,
+    float pow4_normalization_factor)
+{
+    Image src_gx = CONVERT_TO_IMAGE_STRUCT(src_gx);
+    Image src_gy = CONVERT_TO_IMAGE_STRUCT(src_gy);
+    Image vc     = CONVERT_TO_IMAGE_STRUCT(vc);
+
+    /* Gx^2, Gy^2 and Gx*Gy */
+    float16 res = (float16)0.0f;
+
+    /* Compute row */
+    for(int i = -3; i < 4; i++)
+    {
+        res += harris_score_1x7(&src_gx, &src_gy, i);
+    }
+
+    float4 gx2  = res.s0123;
+    float4 gy2  = res.s4567;
+    float4 gxgy = res.s89AB;
+
+    /* Compute trace and determinant */
+    float4 trace = gx2 + gy2;
+    float4 det   = gx2 * gy2 - (gxgy * gxgy);
+
+    /* Compute harris score */
+    float4 mc = (det - (sensitivity * (trace * trace))) * pow4_normalization_factor;
+
+    mc = select(0.0f, mc, mc > (float4)strength_thresh);
+
+    vstore4(mc, 0, (__global float *)vc.ptr);
+}
+
+)"
