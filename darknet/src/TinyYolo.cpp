@@ -774,11 +774,16 @@ int main(int argc, char **argv) {
 	TinyYolo yolo = TinyYolo("tiny-yolo-voc.cfg",
 			"tiny-yolo-voc.weights");
 	image im = yolo.load_image( "data/dog.jpg");
-	int times = 1;
-	clock_t st_time = clock();
-	yolo.tiny_yolo_run(im);
-	cout << "Prediction Time: " << sec(clock() - st_time) << endl;
-//	delete yolo;
+	int k=1;
+	if(argc>1){
+		k = stoi(argv[1]);
+	}
+	for(int i=0;i<k;i++){
+		int times = 1;
+		clock_t st_time = clock();
+		yolo.tiny_yolo_run(im);
+		cout << "Prediction Time: " << sec(clock() - st_time) << endl;
+	}
 	return 0;
 }
 
