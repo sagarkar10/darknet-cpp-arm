@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "utils.hpp"
 #include <assert.h>
 #ifdef __linux__
 #include <unistd.h>
@@ -9,22 +10,6 @@
 #include <float.h>
 #include <limits.h>
 
-#include "utils.hpp"
-
-int *read_map(char *filename)
-{
-    int n = 0;
-    int *map = 0;
-    char *str;
-    FILE *file = fopen(filename, "r");
-    if(!file) file_error(filename);
-    while((str=fgetl(file))){
-        ++n;
-        map = (int*)realloc(map, n*sizeof(int));
-        map[n-1] = atoi(str);
-    }
-    return map;
-}
 
 void sorta_shuffle(void *arr, size_t n, size_t size, size_t sections)
 {
@@ -47,6 +32,7 @@ void shuffle(void *arr, size_t n, size_t size)
 		memcpy((char*)arr + (j*size), (char*)arr + (i*size), size);
 		memcpy((char*)arr + (i*size), swp, size);
     }
+    free(swp);
 }
 
 void del_arg(int argc, char **argv, int index)

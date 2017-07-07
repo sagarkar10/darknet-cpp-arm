@@ -1,9 +1,8 @@
 #include "image.hpp"
-#include "utils.hpp"
-//#include "blas.h"
-//#include "cuda.h"
+
 #include <stdio.h>
 #include <math.h>
+#include "utils.hpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.hpp"
@@ -751,7 +750,7 @@ int best_3d_shift(image a, image b, int min, int max)
 
 void composite_3d(char *f1, char *f2, char *out, int delta)
 {
-    if(!out) out = "out";
+    if(!out) out = (char*)"out";
     image a = load_image(f1, 0,0,0);
     image b = load_image(f2, 0,0,0);
     int shift = best_3d_shift_r(a, b, -a.h/100, a.h/100);

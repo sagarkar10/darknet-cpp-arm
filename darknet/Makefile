@@ -22,7 +22,7 @@ endif
 
 CFLAGS+=$(OPTS)
 
-OBJ= darknet.o utils.o image.o box.o 
+OBJ= utils.o image.o box.o TinyYolo.o 
 OBJS = $(addprefix $(OBJDIR), $(OBJ))
 DEPS = $(wildcard src/*.hpp) Makefile
 

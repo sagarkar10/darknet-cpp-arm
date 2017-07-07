@@ -1,6 +1,6 @@
-#include "box.hpp"
 #include <stdio.h>
 #include <math.h>
+#include "box.hpp"
 #include <stdlib.h>
 
 box float_to_box(float *f, int stride)
