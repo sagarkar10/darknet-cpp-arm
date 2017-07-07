@@ -29,8 +29,10 @@ The `run.sh` script takes care of the profiling and genrating reports.
 ### TODO:
 
 - [x] Get the Profiling to work on ArmCompute also
-- [ ] Structure the code
+- [x] Structure the code
+- [ ] Remove un-necessary functions
 - [ ] Document the code (so that it doesn't become another darknet :p)
+- [ ] make the parser more accurate
 - [ ] Complete Dependency on `.cfg` configfiles
 - [ ] Command line arguments to make it more robust and test friendly
 - [ ] Video Support
